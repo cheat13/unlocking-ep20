@@ -15,6 +15,7 @@ namespace mix_coffeeshop_web_test
         {
             var mock = new MockRepository(MockBehavior.Default);
             var repo = mock.Create<mix_coffeeshop_web.Models.IProductRepository>();
+            var api = new mix_coffeeshop_web.Controllers.ProductController(repo.Object);
             repo.Setup(it => it.GetAllProducts()).Returns(()=> new List<Product>
             {
                 new Product(),
@@ -22,7 +23,7 @@ namespace mix_coffeeshop_web_test
                 new Product(),
                 new Product(),
             });
-            var products = repo.Object.GetAllProducts();
+            var products = api.Get();
             products.Should().HaveCount(4);
         }
 
@@ -31,11 +32,11 @@ namespace mix_coffeeshop_web_test
         {
             var mock = new MockRepository(MockBehavior.Default);
             var repo = mock.Create<mix_coffeeshop_web.Models.IProductRepository>();
+            var api = new mix_coffeeshop_web.Controllers.ProductController(repo.Object);
             repo.Setup(it => it.GetAllProducts()).Returns(()=> new List<Product>
             {
-
             });
-            var products = repo.Object.GetAllProducts();
+            var products = api.Get();
             products.Should().HaveCount(0);
         }
 
