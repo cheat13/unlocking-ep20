@@ -10,6 +10,7 @@ namespace mix_coffeeshop_web.Models
     {
         IEnumerable<Product> GetAllProducts();
         void UpdateProduct(Product data);
+        void CreateNewProduct(Product data);
     }
 
     public class ProductRepository : IProductRepository
@@ -39,6 +40,12 @@ namespace mix_coffeeshop_web.Models
         {
             var productCollection = database.GetCollection<Product>("products");
             productCollection.ReplaceOne(it=>it.Id == data.Id, data);
+        }
+
+        public void CreateNewProduct(Product data)
+        {
+            var productCollection = database.GetCollection<Product>("products");
+            productCollection.InsertOne(data);
         }
     }
 }
