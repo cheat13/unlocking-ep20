@@ -53,11 +53,14 @@ namespace mix_coffeeshop_web.Controllers
         [HttpPut]
         public Product UpdateProduct([FromBody]Product product)
         {
-            var selectedProduct = products.FirstOrDefault(it => it.Id == product.Id);
+            var selectedProduct = Get(product.Id);
+            if(selectedProduct == null) return null;
+
             selectedProduct.Name = product.Name;
             selectedProduct.Price = product.Price;
             selectedProduct.Desc = product.Desc;
             selectedProduct.ThumbURL = product.ThumbURL;
+            repo.UpdateProduct(product);
             return selectedProduct;
         }
     }
