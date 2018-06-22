@@ -35,6 +35,9 @@ namespace mix_coffeeshop_web.Controllers
         [HttpPost]
         public Product CreateNewProduct([FromBody]Product product)
         {
+            var isDataCorrect = product != null && !string.IsNullOrEmpty(product.Name);
+            if(!isDataCorrect) return null;
+
             var products = repo.GetAllProducts();
             product.Id = products.Count() + 1;
             repo.CreateNewProduct(product);
