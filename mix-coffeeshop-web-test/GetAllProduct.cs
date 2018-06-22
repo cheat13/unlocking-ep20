@@ -5,6 +5,7 @@ using FluentAssertions.Collections;
 using mix_coffeeshop_web.Models;
 using Moq;
 using Xunit;
+using System.Linq;
 
 namespace mix_coffeeshop_web_test
 {
@@ -15,6 +16,7 @@ namespace mix_coffeeshop_web_test
         {
             var mock = new MockRepository(MockBehavior.Default);
             var repo = mock.Create<mix_coffeeshop_web.Models.IProductRepository>();
+            var api = new mix_coffeeshop_web.Controllers.ProductController(repo.Object);
             repo.Setup(it => it.GetAllProducts()).Returns(()=> new List<Product>
             {
                 new Product(),
@@ -22,7 +24,7 @@ namespace mix_coffeeshop_web_test
                 new Product(),
                 new Product(),
             });
-            var products = repo.Object.GetAllProducts();
+            var products = api.Get();
             products.Should().HaveCount(4);
         }
 
@@ -31,28 +33,51 @@ namespace mix_coffeeshop_web_test
         {
             var mock = new MockRepository(MockBehavior.Default);
             var repo = mock.Create<mix_coffeeshop_web.Models.IProductRepository>();
+            var api = new mix_coffeeshop_web.Controllers.ProductController(repo.Object);
             repo.Setup(it => it.GetAllProducts()).Returns(()=> new List<Product>
             {
-
             });
-            var products = repo.Object.GetAllProducts();
+            var products = api.Get();
             products.Should().HaveCount(0);
         }
 
-        /*
-        Get all products
+        [Theory(DisplayName = "Get a product with correct data Then system return the selected product")]
+        [InlineData(1, 1)]
+        [InlineData(2, 2)]
+        [InlineData(3, 3)]
+        public void GetAnExistingProductFromId(int id, int expectedProductId)
+        {
+            var mock = new MockRepository(MockBehavior.Default);
+            var repo = mock.Create<mix_coffeeshop_web.Models.IProductRepository>();
+            var api = new mix_coffeeshop_web.Controllers.ProductController(repo.Object);
+            var allProducts = new List<Product>
+            {
+                new Product{ Id = 1, Name = "name01", Price = 50, Desc = "desc01", ThumbURL = "img01.png" },
+                new Product{ Id = 2, Name = "name02", Price = 60, Desc = "desc02", ThumbURL = "img02.png" },
+                new Product{ Id = 3, Name = "name03", Price = 70, Desc = "desc03", ThumbURL = "img03.png" },
+            };
+            repo.Setup(it => it.GetAllProducts()).Returns(() => allProducts);
+            var product = api.Get(id);
 
-        Normal cases
-        1. Get products with correct data Then system return all products.
-        2. Get products when no products in the system Then system return 0 product.
+            var expect = allProducts.FirstOrDefault(it => it.Id == expectedProductId);
+            product.Should().NotBeNull().And.BeSameAs(expect);
+        }
 
-        Alternative cases
-        3. Get products with unknow category Then system return 0 product.
-        4. Get products with no privilege Then system show an error message.
+        [Theory(DisplayName = "Get a product with incorrect data Then system return no product")]
+        [InlineData(99)]
+        public void GetNotExistingProductFromId(int id)
+        {
+            var mock = new MockRepository(MockBehavior.Default);
+            var repo = mock.Create<mix_coffeeshop_web.Models.IProductRepository>();
+            var api = new mix_coffeeshop_web.Controllers.ProductController(repo.Object);
+            var allProducts = new List<Product>
+            {
+                new Product{ Id = 1, Name = "name01", Price = 50, Desc = "desc01", ThumbURL = "img01.png" },
+            };
+            repo.Setup(it => it.GetAllProducts()).Returns(() => allProducts);
+            var product = api.Get(id);
 
-        Exception cases
-        5. Get products but can't connect to the server Then system show an error message.
-         */
-
+            product.Should().BeNull();
+        }
     }
 }
