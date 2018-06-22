@@ -21,10 +21,16 @@ namespace mix_coffeeshop_web.Controllers
             new Product{ Id = 6, Name = "Panna Cotta", Price = 100, ThumbURL = "/images/panna-cotta.png" },
         };
 
+        private IProductRepository repo;
+
+        public ProductController(IProductRepository repo)
+        {
+            this.repo = repo;    
+        }
+
         [HttpGet]
         public IEnumerable<Product> Get()
         {
-            var repo = new ProductRepository();
             var products = repo.GetAllProducts();
             return products;
         }
@@ -32,6 +38,7 @@ namespace mix_coffeeshop_web.Controllers
         [HttpGet("{id}")]
         public Product Get(int id)
         {
+            var products = repo.GetAllProducts();
             return products.FirstOrDefault(it => it.Id == id);
         }
 

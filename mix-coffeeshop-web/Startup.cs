@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using mix_coffeeshop_web.Models;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace mix_coffeeshop_web
@@ -24,6 +25,7 @@ namespace mix_coffeeshop_web
         {
             services.AddMvc();
 
+            services.AddTransient<IProductRepository, ProductRepository>();
             // Register the Swagger generator, defindotneting 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {

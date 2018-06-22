@@ -10,6 +10,13 @@ namespace mix_coffeeshop_web.Controllers
 {
     public class HomeController : Controller
     {
+        private IProductRepository repo;
+
+        public HomeController(IProductRepository repo)
+        {
+            this.repo = repo;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -24,7 +31,7 @@ namespace mix_coffeeshop_web.Controllers
 
         public IActionResult MenuManager()
         {
-            var api = new ProductController();
+            var api = new ProductController(repo);
             var products = api.Get();
             return View(products);
         }
@@ -38,7 +45,7 @@ namespace mix_coffeeshop_web.Controllers
         [HttpPost]
         public IActionResult AddItem(Product data)
         {
-            var api = new ProductController();
+            var api = new ProductController(repo);
             api.CreateNewProduct(data);
             return RedirectToAction("MenuManager");
         }
@@ -46,7 +53,7 @@ namespace mix_coffeeshop_web.Controllers
         [HttpGet]
         public IActionResult EditItem(int id)
         {
-            var api = new ProductController();
+            var api = new ProductController(repo);
             var selectedProduct = api.Get().FirstOrDefault(it=> it.Id == id);
             return View(selectedProduct);
         }
@@ -54,7 +61,7 @@ namespace mix_coffeeshop_web.Controllers
         [HttpPost]
         public IActionResult EditItem(Product data)
         {
-            var api = new ProductController();
+            var api = new ProductController(repo);
             var selectedProduct = api.UpdateProduct(data);
             return RedirectToAction("MenuManager");
         }
